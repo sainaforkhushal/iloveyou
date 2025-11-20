@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>For Saina — With Love ❤️</title>
+
+  <style>
+    :root{
+      --bg:#fff5f8;
+      --accent:#ff4d85;
+      --accent2:#ff7ab6;
+      --card:#ffffff;
+      --muted:#6b6b6b;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui}
+    body{
+      background:radial-gradient(1000px 500px at 10% 10%,#ffeaf1,transparent),var(--bg);
+      padding:24px;display:flex;justify-content:center;
+      overflow-x:hidden;
+    }
+
+    .card{
+      width:960px;max-width:100%;
+      background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,250,252,.9));
+      padding:28px;border-radius:22px;
+      box-shadow:0 10px 30px rgba(255,77,133,.15);
+      position:relative;
+    }
+
+    header{display:flex;gap:16px;align-items:center}
+    .avatar{
+      width:84px;height:84px;border-radius:20px;
+      background:url('avatar1.png');
+      background-size:cover;background-position:center;
+      box-shadow:0 6px 18px rgba(255,77,133,.18)
+    }
+
+    h1{margin:0;font-size:28px;color:#2a2a2a}
+    p.lead{color:var(--muted);margin:6px 0 18px}
+
+    .grid{
+      margin-top:20px;display:grid;
+      grid-template-columns:320px 1fr;gap:18px
+    }
+    .card-box{
+      background:var(--card);padding:14px;
+      border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.05)
+    }
+
+    .btn{
+      padding:10px 14px;border:none;border-radius:10px;
+      cursor:pointer;
+      background:linear-gradient(90deg,var(--accent),var(--accent2));
+      color:white;font-weight:600
+    }
+
+    input[type=text]{
+      padding:10px;border-radius:10px;
+      border:1px solid #ffd7ea;width:100%
+    }
+
+    /* Modal */
+    .modal{
+      position:fixed;inset:0;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(0,0,0,.25);
+      backdrop-filter:blur(6px);
+      z-index:50;display:none;
+    }
+    .modal-card{
+      background:white;padding:24px;border-radius:16px;
+      max-width:90%;width:520px;
+      box-shadow:0 20px 50px rgba(0,0,0,.15);
+      position:relative;
+    }
+    .close{
+      position:absolute;right:20px;top:16px;
+      border:none;font-size:20px;background:none;cursor:pointer
+    }
+
+    /* Surprise full-screen overlay (visible during animation) */
+    #surprise-overlay{
+      position:fixed;inset:0;z-index:9999;pointer-events:none;display:none;
+      overflow:hidden;
+      background: radial-gradient(circle at center, rgba(255,240,245,0.08), rgba(0,0,0,0.15) 60%);
+    }
+
+    /* particle common */
+    .particle{
+      position:absolute;will-change:transform,opacity;
+      user-select:none;pointer-events:none;
+      transform-origin:center;
+      text-shadow:0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    /* center flash circle */
+    .center-flash{
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.2);
+      width:300px;height:300px;border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,230,240,0.95), rgba(255,120,170,0.35) 50%, rgba(255,100,160,0.15) 80%, transparent 95%);
+      filter: blur(20px);
+      opacity:0;
+      pointer-events:none;
+    }
+
+    /* drift hearts, petals, sparkles, confetti styles */
+    .drift-heart{ position:fixed; bottom:-40px; pointer-events:none; font-size:28px; opacity:0.95; color:#ff6fa8; }
+    .petal{ font-size:22px; opacity:0.95; }
+    .spark{ font-size:18px; opacity:0.95; filter: drop-shadow(0 4px 8px rgba(255,150,200,0.35)); }
+    .confetti{ width:10px;height:14px;border-radius:2px; opacity:0.95; transform-origin:center; }
+
+    /* music toggle (inline near surprise) */
+    #music-toggle {
+      display: none; /* hidden initially, shown after Surprise clicked */
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-weight:600;
+      background: linear-gradient(90deg,#ffffff,#ffeef6);
+      color: #a0004a;
+      border: 1px solid #ffd7ea;
+      cursor: pointer;
+    }
+
+    @media(max-width:760px){
+      .grid{grid-template-columns:1fr}
+      .avatar{width:64px;height:64px}
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="surprise-overlay" aria-hidden="true"></div>
+
+<div class="card">
+  <header>
+    <div class="avatar" aria-hidden="true"></div>
+    <div>
+      <h1>For Saina ❤️</h1>
+      <p class="lead">A tiny place on the internet that belongs to only us.</p>
+    </div>
+
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <button class="btn" id="open-note">Open a Love Note</button>
+      <button class="btn" id="surprise">Surprise ✨</button>
+      <!-- Music toggle appears here (B) once Surprise is clicked -->
+      <button id="music-toggle" aria-hidden="true">🔊 Pause</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="left">
+
+      <div class="card-box">
+        <h3 style="margin:0">Make a Cute Promise</h3>
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <input type="text" id="promise-input" placeholder="Write a promise...">
+          <button class="btn" id="save-promise">Save</button>
+        </div>
+        <div id="promise-list" style="margin-top:10px;color:#333"></div>
+      </div>
+
+      <div class="card-box">
+        <h3 style="margin:0">Little Things</h3>
+        <ul id="little-things" style="margin-top:10px;color:var(--muted)">
+          <li>Let's make it rain and have a samosa while listening to Fell For You and sipping Cranberry Coolberg &lt;3</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="card-box">
+        <h3 style="margin:0">Love Note</h3>
+        <p id="note-text" style="margin-top:8px;color:#333">Click the button to open your love note.</p>
+        <button class="btn" id="show-secret" style="margin-top:8px">Secret Message</button>
+      </div>
+
+      <div class="card-box" style="margin-top:12px">
+        <h3 style="margin:0 0 8px 0">Gallery</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <img src="image1.jpg" class="gal" alt="gallery 1">
+          <img src="image2.jpg" class="gal" alt="gallery 2">
+          <img src="image3.jpg" class="gal" alt="gallery 3">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <button class="close" id="close-modal" aria-label="Close">✕</button>
+    <h2 id="modal-title" style="margin-top:0">Message</h2>
+    <p id="modal-body" style="color:#333"></p>
+  </div>
+</div>
+
+<!-- Audio (place i_like_me_better.mp3 in same folder) -->
+<audio id="surprise-audio" src="i_like_me_better.mp3" preload="auto"></audio>
+
+<script>
+/* ---------- SETTINGS ---------- */
+const SURPRISE_DURATION_MS = 13000; // 13 seconds
+
+/* ---------- TEXT ---------- */
+const loveNote = `Hi Saina, Happy 5 months to us! ❤️
+
+It honestly feels unreal to spend 5 months knowing you love me — like *actually* love-love me. You've made me feel so loved and these 5 months have been the happiest phase of my life. Be it Ethereal, college or anything else — we were together and we will be. ❤️
+
+I love you so much, Saina! ❤️`;
+
+const secretMsg = `You are not allowed to leave me, EVER!!!!!!!!`;
+
+/* ---------- ELEMENTS ---------- */
+const modal = document.getElementById("modal");
+const modalBody = document.getElementById("modal-body");
+const overlay = document.getElementById("surprise-overlay");
+const audio = document.getElementById("surprise-audio");
+const musicToggle = document.getElementById("music-toggle");
+
+/* ---------- SMALL HEART BURST ---------- */
+function popHearts(count=12) {
+  for (let i = 0; i < count; i++) {
+    const heart = document.createElement("div");
+    heart.className = 'particle';
+    heart.textContent = "❤️";
+    const left = Math.random() * (window.innerWidth - 60) + 30;
+    heart.style.left = left + "px";
+    heart.style.bottom = "-20px";
+    heart.style.fontSize = (18 + Math.random() * 16) + "px";
+    heart.style.opacity = 1;
+    heart.style.transition = `transform 2400ms cubic-bezier(.2,.9,.2,1), opacity 2400ms linear`;
+    document.body.appendChild(heart);
+
+    setTimeout(() => {
+      const translateY = -220 - Math.random()*140;
+      const translateX = (-80 + Math.random()*160);
+      heart.style.transform = `translate(${translateX}px, ${translateY}px) rotate(${(-30 + Math.random()*60)}deg) scale(${1 + Math.random()*0.6})`;
+      heart.style.opacity = 0;
+    }, 60);
+
+    setTimeout(() => heart.remove(), 2600);
+  }
+}
+
+/* ---------- HELPER: random color ---------- */
+function randomColor(){
+  const palette = ['#ff7ab6','#ff4d85','#ffd1e8','#fff0f6','#ff9ac1','#ffd7ea','#ffb6da'];
+  return palette[Math.floor(Math.random()*palette.length)];
+}
+
+/* ---------- MAIN: extravagant full-screen Bollywood surprise ---------- */
+function extravagantSurprise() {
+  const D = SURPRISE_DURATION_MS;
+  overlay.style.display = 'block';
+  overlay.innerHTML = ''; // clear
+
+  // CENTER FLASH
+  const flash = document.createElement('div');
+  flash.className = 'center-flash';
+  overlay.appendChild(flash);
+  // animate by JS
+  setTimeout(()=> {
+    flash.style.transition = `transform ${D*0.25}ms ease-out, opacity ${D*0.6}ms ease-out`;
+    flash.style.opacity = 1;
+    flash.style.transform = 'translate(-50%,-50%) scale(1.25)';
+  }, 30);
+
+  // CENTER EXPLOSION EMOJIS
+  const emojis = ["❤️","💖","💗","💞","💕","✨","🌸","💓","💘","🌹","💐"];
+  const centerCount = 70;
+  for (let i = 0; i < centerCount; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.left = (window.innerWidth/2) + 'px';
+    el.style.top = (window.innerHeight/2) + 'px';
+    el.style.fontSize = (20 + Math.random()*46) + 'px';
+    el.style.opacity = 1;
+    overlay.appendChild(el);
+
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 180 + Math.random()*540;
+    const dx = Math.cos(angle) * distance;
+    const dy = Math.sin(angle) * distance * 0.9;
+    const delay = Math.random() * 450;
+
+    setTimeout(() => {
+      el.style.transition = `transform ${D*0.6}ms cubic-bezier(.15,.9,.2,1), opacity ${D*0.6}ms linear`;
+      el.style.transform = `translate(${dx}px, ${dy}px) rotate(${Math.random()*720-360}deg) scale(${1.1 + Math.random()*0.9})`;
+      el.style.opacity = 0;
+    }, 80 + delay);
+
+    setTimeout(()=>el.remove(), D*0.8 + 800 + delay);
+  }
+
+  // TOP-DOWN ROSE PETAL SHOWER
+  const petalCount = 80;
+  for (let i = 0; i < petalCount; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle petal';
+    p.textContent = "🌹";
+    p.style.left = (Math.random()*100) + '%';
+    p.style.top = '-50px';
+    p.style.fontSize = (18 + Math.random()*28) + 'px';
+    overlay.appendChild(p);
+
+    const driftX = (-160 + Math.random()*320);
+    const fall = window.innerHeight + 240 + Math.random()*200;
+    const delay = Math.random()*900;
+    setTimeout(() => {
+      p.style.transition = `transform ${D*0.95}ms cubic-bezier(.2,.8,.2,1), opacity ${D*0.95}ms linear`;
+      p.style.transform = `translate(${driftX}px, ${fall}px) rotate(${Math.random()*720-360}deg)`;
+      p.style.opacity = 0;
+    }, 140 + delay);
+    setTimeout(()=>p.remove(), D + 1400 + delay);
+  }
+
+  // SIDE BURSTS (sparkles/fireworks)
+  const sideCount = 60;
+  for (let i = 0; i < sideCount; i++) {
+    const s = document.createElement('div');
+    s.className = 'particle spark';
+    s.textContent = ["✨","💫","🌟","💥"][Math.floor(Math.random()*4)];
+    s.style.left = (Math.random()*100) + '%';
+    s.style.top = (Math.random()*80 + 5) + '%';
+    s.style.fontSize = (16 + Math.random()*36) + 'px';
+    overlay.appendChild(s);
+
+    const up = -120 - Math.random()*360;
+    const leftShift = (-240 + Math.random()*480);
+    const delay = Math.random()*700;
+    setTimeout(()=> {
+      s.style.transition = `transform ${D*0.6}ms ease-out, opacity ${D*0.6}ms linear`;
+      s.style.transform = `translate(${leftShift}px, ${up}px) rotate(${Math.random()*360-180}deg) scale(${1 + Math.random()*0.6})`;
+      s.style.opacity = 0;
+    }, 80 + delay);
+    setTimeout(()=>s.remove(), D*0.75 + 900 + delay);
+  }
+
+  // CONFETTI STRIPS
+  const confettiCount = 110;
+  for (let i = 0; i < confettiCount; i++) {
+    const c = document.createElement('div');
+    c.className = 'particle confetti';
+    c.style.left = (Math.random()*100) + '%';
+    c.style.top = (Math.random()*8 - 10) + '%';
+    c.style.background = `linear-gradient(90deg, ${randomColor()}, ${randomColor()})`;
+    c.style.transform = `rotate(${Math.random()*360}deg)`;
+    overlay.appendChild(c);
+
+    const fall = window.innerHeight + 400;
+    const swing = (-240 + Math.random()*480);
+    const delay = Math.random()*900;
+    setTimeout(()=> {
+      c.style.transition = `transform ${D*0.95}ms cubic-bezier(.25,.9,.2,1), opacity ${D*0.95}ms linear`;
+      c.style.transform = `translate(${swing}px, ${fall}px) rotate(${Math.random()*720}deg)`;
+      c.style.opacity = 0;
+    }, 140 + delay);
+    setTimeout(()=>c.remove(), D + 1600 + delay);
+  }
+
+  // SLOW DRIFTING BIG HEARTS (romantic slow motion)
+  const driftCount = 16;
+  for (let i=0;i<driftCount;i++){
+    const h = document.createElement('div');
+    h.className = 'particle drift-heart';
+    h.textContent = "❤️";
+    h.style.left = (Math.random()*100) + 'vw';
+    h.style.bottom = (-80 - Math.random()*320) + 'px';
+    h.style.fontSize = (36 + Math.random()*68) + 'px';
+    overlay.appendChild(h);
+
+    const rise = window.innerHeight + 800;
+    const sideways = (-300 + Math.random()*600);
+    setTimeout(()=>{
+      h.style.transition = `transform ${D*1.05}ms linear, opacity ${D*1.05}ms linear`;
+      h.style.transform = `translate(${sideways}px, -${rise}px) rotate(${Math.random()*180-90}deg)`;
+      h.style.opacity = 0;
+    }, 220 + Math.random()*600);
+    setTimeout(()=>h.remove(), D + 2200);
+  }
+
+  // Final cinematic: subtle zoom out and fade center flash
+  setTimeout(()=> {
+    flash.style.opacity = 0;
+    flash.style.transform = 'translate(-50%,-50%) scale(0.6)';
+  }, D*0.6);
+
+  // cleanup overlay after duration + buffer
+  setTimeout(()=> {
+    overlay.style.display = 'none';
+    overlay.innerHTML = '';
+  }, D + 800);
+}
+
+/* ---------- BUTTON LOGIC ---------- */
+document.getElementById("open-note").onclick = () => {
+  modalBody.innerText = loveNote;
+  modal.style.display = "flex";
+  popHearts(12);
+};
+
+document.getElementById("show-secret").onclick = () => {
+  modalBody.innerText = secretMsg;
+  modal.style.display = "flex";
+  popHearts(12);
+};
+
+document.getElementById("close-modal").onclick = () => {
+  modal.style.display = "none";
+};
+
+/* SURPRISE BUTTON triggers animation + audio (manual stop via toggle) */
+document.getElementById("surprise").onclick = () => {
+  // hearts at start
+  popHearts(22);
+
+  // start the big full-screen animation
+  extravagantSurprise();
+
+  // play audio (no auto-stop) and show the inline toggle button
+  try { audio.currentTime = 0; } catch(e){}
+  const p = audio.play();
+  if (p && p.catch) p.catch(()=>{/* ignore playback errors */});
+
+  // show inline music toggle and set initial state
+  musicToggle.style.display = 'inline-block';
+  musicToggle.setAttribute('aria-hidden','false');
+  musicToggle.textContent = audio.paused ? "🔊 Play" : "🔊 Pause";
+};
+
+/* Music toggle behavior (inline button) */
+musicToggle.addEventListener('click', () => {
+  if (!audio) return;
+  if (audio.paused) {
+    audio.play().catch(()=>{});
+    musicToggle.textContent = "🔊 Pause";
+  } else {
+    audio.pause();
+    musicToggle.textContent = "🔊 Play";
+  }
+});
+
+/* ---------- PROMISE SAVING ---------- */
+document.getElementById("save-promise").onclick = () => {
+  const val = document.getElementById("promise-input").value;
+  if(val.trim()==="") return;
+  const d = document.createElement("div");
+  d.textContent = "• " + val;
+  document.getElementById("promise-list").appendChild(d);
+  document.getElementById("promise-input").value = "";
+};
+
+/* ---------- IMAGE ZOOM (modal) with close button ---------- */
+document.querySelectorAll(".gal").forEach(img => {
+  // keep images as they originally were
+  img.style.width = "100px";
+  img.style.height = "100px";
+  img.style.borderRadius = "12px";
+  img.style.objectFit = "cover";
+  img.style.cursor = "pointer";
+
+  img.onclick = () => {
+    modalBody.innerHTML = `
+      <div style="position:relative; padding:0;">
+        <button 
+          id="img-close" 
+          style="
+            position:absolute;
+            right:-12px;
+            top:-12px;
+            background:#ff4d85;
+            color:white;
+            border:none;
+            border-radius:50%;
+            width:40px;
+            height:40px;
+            font-size:22px;
+            cursor:pointer;
+            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+            z-index:10000;
+          "
+        >×</button>
+
+        <img 
+          src="${img.src}" 
+          alt="zoomed" 
+          style="
+            width:100%;
+            border-radius:12px;
+            display:block;
+          "
+        >
+      </div>
+    `;
+
+    modal.style.display = "flex";
+
+    // close button works perfectly
+    document.getElementById("img-close").onclick = () => {
+      modal.style.display = "none";
+    };
+  };
+});
+
+/* ---------- audio error handler ---------- */
+audio.addEventListener('error', ()=> {
+  console.warn('Audio failed to load - ensure i_like_me_better.mp3 is in the same folder and is a valid file.');
+});
+</script>
+
+</body>
+</html>
