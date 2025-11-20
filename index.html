@@ -445,15 +445,87 @@ musicToggle.addEventListener('click', () => {
   }
 });
 
-/* ---------- PROMISE SAVING ---------- */
+/* ---------- PROMISE SYSTEM WITH AUTOSAVE ---------- */
+
+const promiseList = document.getElementById("promise-list");
+
+/* Load saved promises on page load */
+function loadPromises() {
+  const saved = JSON.parse(localStorage.getItem("promises") || "[]");
+  saved.forEach(text => addPromiseToDOM(text, false));
+}
+
+loadPromises();
+
+/* Add promise to DOM */
+function addPromiseToDOM(text, save = true) {
+  const wrapper = document.createElement("div");
+  wrapper.style.display = "flex";
+  wrapper.style.justifyContent = "space-between";
+  wrapper.style.alignItems = "center";
+  wrapper.style.marginTop = "6px";
+
+  const p = document.createElement("span");
+  p.textContent = "• " + text;
+
+  const del = document.createElement("button");
+  del.textContent = "✕";
+  del.style.marginLeft = "10px";
+  del.style.border = "none";
+  del.style.background = "transparent";
+  del.style.cursor = "pointer";
+  del.style.color = "var(--accent)";
+  del.style.fontSize = "16px";
+  del.style.fontWeight = "bold";
+
+  del.onclick = () => {
+    showPromiseMessage();
+  };
+
+  wrapper.appendChild(p);
+  wrapper.appendChild(del);
+  promiseList.appendChild(wrapper);
+
+  if (save) savePromise(text);
+}
+
+/* Save promise to localStorage */
+function savePromise(text) {
+  const saved = JSON.parse(localStorage.getItem("promises") || "[]");
+  saved.push(text);
+  localStorage.setItem("promises", JSON.stringify(saved));
+}
+
+/* Add new promise */
 document.getElementById("save-promise").onclick = () => {
-  const val = document.getElementById("promise-input").value;
-  if(val.trim()==="") return;
-  const d = document.createElement("div");
-  d.textContent = "• " + val;
-  document.getElementById("promise-list").appendChild(d);
+  const val = document.getElementById("promise-input").value.trim();
+  if(val === "") return;
+  addPromiseToDOM(val);
   document.getElementById("promise-input").value = "";
 };
+
+/* Cute "what does a promise mean cutu" message */
+function showPromiseMessage() {
+  const msg = document.createElement("div");
+  msg.textContent = "what does a promise mean cutu 💗";
+  msg.style.position = "fixed";
+  msg.style.top = "20px";
+  msg.style.right = "20px";
+  msg.style.padding = "12px 18px";
+  msg.style.background = "white";
+  msg.style.borderRadius = "12px";
+  msg.style.boxShadow = "0 6px 20px rgba(0,0,0,0.15)";
+  msg.style.color = "#ff4d85";
+  msg.style.fontWeight = "600";
+  msg.style.zIndex = "2000";
+  msg.style.opacity = "0";
+  msg.style.transition = "opacity 0.4s ease";
+
+  document.body.appendChild(msg);
+
+  setTimeout(() => (msg.style.opacity = "1"), 20);
+  setTimeout(() => msg.remove(), 2200);
+}
 
 /* ---------- IMAGE ZOOM (modal) with close button ---------- */
 document.querySelectorAll(".gal").forEach(img => {
@@ -515,4 +587,3 @@ audio.addEventListener('error', ()=> {
 
 </body>
 </html>
-
